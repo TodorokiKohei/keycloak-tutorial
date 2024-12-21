@@ -9,6 +9,9 @@ spec:
     - name: http
       port: 8080
       targetPort: 8080
+    - name: https
+      port: 8443
+      targetPort: 8443
   selector:
     app: keycloak
   type: LoadBalancer
@@ -42,10 +45,30 @@ spec:
               value: "edge"
             - name: KC_HEALTH_ENABLED
               value: "true"
+            - name: KC_HTTP_ENABLED
+              value: "true"
+            - name: KC_HTTP_MANAGEMENT_PORT
+              value: "9000"
+            - name: KC_HTTPS_CERTIFICATE_FILE
+              value: "/opt/keycloak/tls/tls.crt"
+            - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+              value: "/opt/keycloak/tls/tls.key"
           ports:
             - name: http
               containerPort: 8080
+            - name: https
+              containerPort: 8443
           readinessProbe:
             httpGet:
               path: /health/ready
               port: 9000
+              scheme: HTTPS
+          volumeMounts:
+            - name: tls-cert
+              mountPath: "/opt/keycloak/tls"
+              readOnly: true
+      volumes:
+        - name: tls-cert
+          secret:
+            secretName: keycloak-cert
+
