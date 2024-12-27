@@ -67,8 +67,14 @@ spec:
             - name: tls-cert
               mountPath: "/opt/keycloak/tls"
               readOnly: true
+            - name: data
+              mountPath: "/opt/keycloak/data"
       volumes:
         - name: tls-cert
           secret:
             secretName: keycloak-cert
+        - name: data
+          hostPath:
+            path: /var/data/keycloak
+            type: DirectoryOrCreate
 
